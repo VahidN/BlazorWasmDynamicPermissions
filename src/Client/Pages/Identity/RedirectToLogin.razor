@@ -1,0 +1,31 @@
+﻿@using System.Security.Claims
+@if (AuthState is not null)
+{
+    <div class="alert alert-danger mt-3">
+        <p>You [@AuthState.User.Identity?.Name] don't have access to the requested page [@NavigationManager.GetCurrentRelativePath()].</p>
+    </div>
+    <div class="alert alert-info mt-3">
+        Your roles:
+        <ul>
+            @foreach (var claim in AuthState.GetUserClaimValues(ClaimTypes.Role))
+            {
+                <li>@claim</li>
+            }
+        </ul>
+    </div>
+
+    @if (DynamicPermissions is not null)
+    {
+        <div class="alert alert-success mt-3">
+            Your allowed pages:
+            <ul>
+                @foreach (var claim in DynamicPermissions.ClaimValues)
+                {
+                    <li>
+                        <a href="@claim">@claim</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}

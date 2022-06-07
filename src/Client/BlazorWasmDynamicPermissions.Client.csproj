@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <PublishIISAssets>true</PublishIISAssets>
+    <ImplicitUsings>enable</ImplicitUsings>
+     <BlazorLinkOnBuild Condition="'$(Configuration)'!='Release'">false</BlazorLinkOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Blazored.LocalStorage" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+    <PackageReference Include="System.Net.Http.Json" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\BlazorWasmDynamicPermissions.Shared.csproj" />
+  </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="libman.json" />
+        <Content Remove="package.json" />
+        <Content Remove="tsconfig.json" />
+        <Content Remove="node_modules\**" />
+    </ItemGroup>
+
+    <Target Name="DebugEnsureLibManEnv" BeforeTargets="BeforeBuild" Condition=" '$(Configuration)' == 'Debug' ">
+        <!-- Ensure libman is installed -->
+        <Exec Command="libman --version" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+        </Exec>
+        <Error Condition="'$(ErrorCode)' != '0'" Text="libman is required to build and run this project. To continue, please run `dotnet tool install -g Microsoft.Web.LibraryManager.Cli`, and then restart your command prompt or IDE." />
+        <Message Importance="high" Text="Restoring dependencies using 'libman'. This may take several minutes..." />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="libman restore" />
+    </Target>
+</Project>

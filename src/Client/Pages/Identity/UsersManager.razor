@@ -1,0 +1,50 @@
+@page "/users-manager"
+
+<PageTitle>Users Manager</PageTitle>
+
+<h2>Users Manager</h2><hr/>
+
+<table class="table table-striped table-hover mt-3">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">User Name</th>
+        <th scope="col">Display Name</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (Users is null)
+    {
+        <tr>
+            <td colspan="4">
+                <div class="alert alert-info">
+                    Loading ...
+                </div>
+            </td>
+        </tr>
+    }
+    else
+    {
+        @foreach (var user in Users)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.Username</td>
+                <td>@user.DisplayName</td>
+                <td>
+                    <a href="user-client-side-permissions/@user.Id" class="btn btn-success btn-sm">
+                        <i class="bi bi-list-check"></i> Dynamic Client-Side Permissions
+                    </a>
+                </td>
+                <td>
+                    <a href="user-server-side-permissions/@user.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-card-checklist"></i> Dynamic Server-Side Permissions
+                    </a>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>

@@ -1,0 +1,66 @@
+@page "/user-client-side-permissions/{UserId:int}"
+
+<PageTitle>Client-Side Permissions</PageTitle>
+
+<h2>@User?.Username Client-Side Permissions</h2><hr/>
+
+<div>
+    <a class="btn btn-secondary btn-block mr-2 mt-5" href="users-manager">
+        <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+</div>
+
+@if (ProtectedPagesProvider.ProtectedPages.Count > 0)
+{
+    <ul class="list-group list-group-flush mt-5">
+        <li class="list-group-item" role="presentation">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" name="selectAll" id="selectAll"
+                       @onchange="@(eventArgs => SelectAllCheckboxClicked(eventArgs.Value))"/>
+                <label class="form-check-label" for="selectAll">Select All</label>
+            </div>
+        </li>
+    </ul>
+}
+
+@foreach (var routablePage in ProtectedPagesProvider.ProtectedPages)
+{
+    <div class="card mt-3">
+        @if (!string.IsNullOrWhiteSpace(routablePage.GroupName))
+        {
+            <div class="card-header">
+                <h4 class="card-title">
+                    @routablePage.GroupName
+                </h4>
+            </div>
+        }
+        <ul class="list-group list-group-flush">
+            @foreach (var pageItem in routablePage.GroupItems)
+            {
+                <li class="list-group-item" role="presentation">
+                    <div class="form-check form-switch">
+                        <input type="checkbox"
+                               checked=@IsComponentChecked(pageItem.Url)
+                               class="form-check-input"
+                               name="permissionComponent"
+                               id="permissionComponent"
+                               @onchange="@(eventArgs => ComponentCheckboxClicked(pageItem.Url, eventArgs.Value))"/>
+                        <label class="form-check-label" for="permissionComponent">@pageItem.Title</label>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<div>
+    <a class="btn btn-secondary btn-block mr-2 mt-3" href="users-manager">
+        <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+
+    <button type="button"
+            class="btn btn-success btn-block mt-3"
+            @onclick="DoAddOrUpdateClaimsAsync">
+        <i class="bi bi-list-check"></i> Save Changes
+    </button>
+</div>

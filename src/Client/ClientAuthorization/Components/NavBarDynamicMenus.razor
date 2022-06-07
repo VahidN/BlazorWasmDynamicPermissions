@@ -1,0 +1,33 @@
+@foreach (var mainMenuItem in ProtectedPagesProvider.ProtectedPages)
+{
+    var allowedMenuItems = GetAllowedMenuItems(mainMenuItem);
+    if (allowedMenuItems.Count == 0)
+    {
+        continue;
+    }
+
+    @if (string.IsNullOrWhiteSpace(mainMenuItem.GroupName))
+    {
+        @foreach (var menuItem in allowedMenuItems)
+        {
+            <li class="nav-item dropdown">
+                <NavLink class="nav-link" href="@menuItem.Url" Match="NavLinkMatch.All">
+                    @if (!string.IsNullOrWhiteSpace(menuItem.GlyphIcon))
+                    {
+                        <i class="@menuItem.GlyphIcon me-2"></i>
+                    }
+                    @menuItem.Title
+                </NavLink>
+            </li>
+        }
+    }
+    else
+    {
+        var menuItems = allowedMenuItems.Select(
+            pageAttribute => new DropdownMenuItem(pageAttribute.Title ?? "No-Name!", pageAttribute.Url, pageAttribute.GlyphIcon)
+            ).ToList();
+        <NavBarDropdownMenu
+            MainTitle="@mainMenuItem.GroupName"
+            Items="menuItems"/>
+    }
+}

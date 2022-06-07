@@ -1,0 +1,22 @@
+<li @attributes="@AdditionalAttributes" class="nav-item dropdown" tabindex="-1"
+    @onmouseover="MouseIn" @onmouseout="MouseOut" @onfocusout="FocusOut">
+    <a @onclick="ToggleShowMenu"
+       class="nav-link dropdown-toggle" type="button" id="@UniqueId"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        @MainTitle
+    </a>
+    <ul class="dropdown-menu slideIn" aria-labelledby="@UniqueId" style="@MenuStyle">
+        @foreach (var item in Items)
+        {
+            <li>
+                <NavLink href="@item.Url" @onclick="ToggleShowMenu" class="dropdown-item" Match="NavLinkMatch.All">
+                    @if (!string.IsNullOrWhiteSpace(item.GlyphIcon))
+                    {
+                        <i class="@item.GlyphIcon me-2"></i>
+                    }
+                    @item.Title
+                </NavLink>
+            </li>
+        }
+    </ul>
+</li>

@@ -1,0 +1,45 @@
+<div class="card mt-5">
+    <div class="card-header">
+        <h4 class="card-title">
+            Call Dynamically Secured Server API's
+        </h4>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item" role="presentation">
+            <button type="button" class="btn btn-success me-2"
+                    @onclick="OnCallMyUserInfoHttpGetAsync">
+                Call MyUserInfo [HttpGet]
+            </button>
+        </li>
+        <li class="list-group-item" role="presentation">
+            <button type="button" class="btn btn-secondary me-2"
+                    @onclick="OnCallMyUserInfoHttpPostAsync">
+                Call MyUserInfo [HttpPost]
+            </button>
+        </li>
+        @if (UserDto is not null)
+        {
+            <li class="list-group-item" role="presentation">
+                Username: @UserDto.Username, DisplayName: @UserDto.DisplayName
+            </li>
+        }
+        <li class="list-group-item" role="presentation">
+            <button type="button" class="btn btn-primary"
+                    @onclick="OnCallMyDynamicClientClaimsHttpGetAsync">
+                Call MyDynamicClientClaims [HttpGet]
+            </button>
+        </li>
+        @if (ClaimsResponseDto is not null)
+        {
+            <li class="list-group-item" role="presentation">
+                ClaimValues:
+                <ul>
+                    @foreach (var claim in ClaimsResponseDto.ClaimValues)
+                    {
+                        <li>@claim</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+</div>

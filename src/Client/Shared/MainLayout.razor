@@ -1,0 +1,65 @@
+﻿@inherits LayoutComponentBase
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">DNT.BWDP</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <AuthorizeView>
+                    <Authorized>
+                        <NavBarDropdownMenu
+                            MainTitle="@context.GetDisplayName("DisplayName", "Welcome")"
+                            Items="UserMenuItems"/>
+                        <SecurityTrim
+                            AllowAnonymous="false"
+                            AllowedRoles="@CustomRoles.Admin"
+                            AllowedClaims="null">
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="users-manager" Match="NavLinkMatch.All">
+                                    Users Manager
+                                </NavLink>
+                            </li>
+                        </SecurityTrim>
+                        <NavBarDynamicMenus/>
+                    </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="login" Match="NavLinkMatch.All">
+                                Login
+                            </NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 mb-5">
+    <ErrorBoundary @ref="OurErrorBoundary">
+        <ErrorContent Context="exception">
+            <div dir="ltr" class="alert alert-danger">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                        @onclick="ResetBoundary">
+                </button>
+                @exception
+            </div>
+        </ErrorContent>
+        <ChildContent>
+            @Body
+        </ChildContent>
+    </ErrorBoundary>
+</div>
+
+<footer class="mt-auto py-3 bg-light">
+    <div class="container d-flex justify-content-center align-self-center">
+        <span class="text-muted">DNT.Blazor Wasm Dynamic Permissions</span>
+    </div>
+</footer>

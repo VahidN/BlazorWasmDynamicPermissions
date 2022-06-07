@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+          name="viewport"/>
+    <title>Blazor Wasm Dynamic Permissions</title>
+    <base href="/"/>
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css?v=5" rel="stylesheet"/>
+    <link href="lib/bootstrap-icons/font/bootstrap-icons.css?v=5" rel="stylesheet"/>
+    <link href="css/app.css?v=1" rel="stylesheet"/>
+    <link href="BlazorWasmDynamicPermissions.Client.styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="d-flex flex-column min-vh-100" id="app">
+    <div class="d-flex vh-100">
+        <div class="d-flex w-100 justify-content-center align-self-center">
+            <div class="spinner-border text-success m-5" role="status" style="width: 5rem; height: 5rem">
+                <span class="visually-hidden">Loading ... </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a class="reload" href="">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.webassembly.js?v=601"></script>
+</body>
+</html>

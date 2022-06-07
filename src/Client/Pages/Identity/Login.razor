@@ -1,0 +1,30 @@
+﻿@page "/login"
+
+<PageTitle>Login</PageTitle>
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h4 class="card-title">
+            Login
+        </h4>
+    </div>
+    <div class="card-body">
+        <EditForm Model="Model" OnValidSubmit="LoginUserAsync">
+            <DataAnnotationsValidator/>
+            <InputText @bind-Value="Model.Username"
+                       autocomplete="username"
+                       placeholder="user name..."
+                       class="form-control mb-2"/>
+            <ValidationMessage For="() => Model.Username"></ValidationMessage>
+            <InputText @bind-Value="Model.Password"
+                       type="password"
+                       autocomplete="currentpassword"
+                       placeholder="Password..."
+                       class="form-control mb-2"/>
+            <ValidationMessage For="() => Model.Password"></ValidationMessage>
+            <button type="submit" class="btn btn-success btn-block">
+                <i class="bi bi-unlock"></i> Login
+            </button>
+        </EditForm>
+    </div>
+</div>

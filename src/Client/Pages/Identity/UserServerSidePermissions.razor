@@ -1,0 +1,90 @@
+@page "/user-server-side-permissions/{UserId:int}"
+
+<PageTitle>Server-Side Permissions</PageTitle>
+
+<h2>@User?.Username Server-Side Permissions</h2><hr/>
+
+<div>
+    <a class="btn btn-secondary btn-block mr-2 mt-5" href="users-manager">
+        <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+</div>
+
+@if (DynamicallySecuredActions is null)
+{
+    <div class="alert alert-info">
+        Loading ...
+    </div>
+}
+else
+{
+    @if (DynamicallySecuredActions.Count > 0)
+    {
+        <ul class="list-group list-group-flush mt-5">
+            <li class="list-group-item" role="presentation">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" name="selectAll" id="selectAll"
+                           @onchange="@(eventArgs => SelectAllCheckboxClicked(eventArgs.Value))"/>
+                    <label class="form-check-label" for="selectAll">Select All</label>
+                </div>
+            </li>
+        </ul>
+    }
+    @foreach (var apiController in DynamicallySecuredActions.OrderBy(c => c.ControllerDisplayName))
+    {
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4 class="card-title">
+                    @if (string.IsNullOrWhiteSpace(apiController.ControllerDisplayName))
+                    {
+                        @apiController.ControllerName
+                    }
+                    else
+                    {
+                        @apiController.ControllerDisplayName
+                    }
+                </h4>
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var apiAction in apiController.ApiActions.OrderBy(a => a.ActionDisplayName))
+                {
+                    var actionId = GetActionId(apiController, apiAction);
+                    var method = string.Join(",", apiAction.HttpMethods);
+                    <li class="list-group-item" role="presentation">
+                        <div class="form-check form-switch">
+                            <input type="checkbox"
+                                   checked=@IsActionChecked(actionId)
+                                   class="form-check-input"
+                                   name="permissionComponent"
+                                   id="permissionComponent"
+                                   @onchange="@(eventArgs => ActionCheckboxClicked(actionId, eventArgs.Value))"/>
+                            <label class="form-check-label" for="permissionComponent">
+                                <span class="badge rounded-pill @GetHttpMethodClass(method) me-2">@method</span>
+                                @if (string.IsNullOrWhiteSpace(apiAction.ActionDisplayName))
+                                {
+                                    @apiAction.ActionName
+                                }
+                                else
+                                {
+                                    @apiAction.ActionDisplayName
+                                }
+                            </label>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div>
+        <a class="btn btn-secondary btn-block mr-2 mt-3" href="users-manager">
+            <i class="bi bi-arrow-left-circle"></i> Back
+        </a>
+
+        <button type="button"
+                class="btn btn-success btn-block mt-3"
+                @onclick="DoAddOrUpdateClaimsAsync">
+            <i class="bi bi-list-check"></i> Save Changes
+        </button>
+    </div>
+}

@@ -1,0 +1,24 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly"
+            PreferExactMatches="true">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <div role="alert" class="alert alert-info">
+                        Authorizing... Please wait...
+                    </div>
+                </Authorizing>
+                <NotAuthorized>
+                    <RedirectToLogin></RedirectToLogin>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found!</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div role="alert" class="alert alert-danger">Sorry, there's nothing at this address.</div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
