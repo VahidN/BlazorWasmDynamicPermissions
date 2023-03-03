@@ -22,7 +22,7 @@ public partial class NavBarDynamicMenus
 
     private ClaimsResponseDto? DynamicPermissions { set; get; }
 
-    private IReadOnlyList<ProtectedPageAttribute> GetAllowedMenuItems(GroupedProtectedPage mainMenuItem)
+    private List<ProtectedPageAttribute> GetAllowedMenuItems(GroupedProtectedPage mainMenuItem)
     {
         return mainMenuItem.GroupItems.Where(
             pageAttribute => SecurityTrimmingService.HasUserAccessToProtectedPage(

@@ -21,7 +21,7 @@ public class ApiActionsDiscoveryService : IApiActionsDiscoveryService
 
     public IReadOnlyList<ApiControllerDto> DynamicallySecuredActions { get; }
 
-    private IReadOnlySet<ApiControllerDto> GetDynamicallySecuredActions()
+    private HashSet<ApiControllerDto> GetDynamicallySecuredActions()
     {
         var apiControllers = new HashSet<ApiControllerDto>(new ApiControllerEqualityComparer());
 

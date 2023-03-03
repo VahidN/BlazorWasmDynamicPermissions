@@ -63,9 +63,9 @@ public class UserClaimsService : IUserClaimsService
     public Task<List<User>> GetUsersHaveUserClaimTypeAsync(string claimType)
     {
         var claimUserIdsQuery = from userClaim in _context.UserClaims
-            where userClaim.ClaimType == claimType
-            from user in userClaim.Users
-            select user.Id;
+                                where userClaim.ClaimType == claimType
+                                from user in userClaim.Users
+                                select user.Id;
         return _context.Users.Where(user => claimUserIdsQuery.Contains(user.Id))
             .ToListAsync();
     }
@@ -73,9 +73,9 @@ public class UserClaimsService : IUserClaimsService
     public Task<List<User>> GetUsersHaveUserClaimAsync(string claimType, string claimValue)
     {
         var claimUserIdsQuery = from userClaim in _context.UserClaims
-            where userClaim.ClaimType == claimType && userClaim.ClaimValue == claimValue
-            from user in userClaim.Users
-            select user.Id;
+                                where userClaim.ClaimType == claimType && userClaim.ClaimValue == claimValue
+                                from user in userClaim.Users
+                                select user.Id;
         return _context.Users.Where(user => claimUserIdsQuery.Contains(user.Id))
             .ToListAsync();
     }
@@ -159,27 +159,27 @@ public class UserClaimsService : IUserClaimsService
     private IQueryable<UserClaim> GetUserClaimTypesQuery(int userId, string claimType)
     {
         return from userClaim in _context.UserClaims
-            where userClaim.ClaimType == claimType
-            from user in userClaim.Users
-            where user.Id == userId
-            select userClaim;
+               where userClaim.ClaimType == claimType
+               from user in userClaim.Users
+               where user.Id == userId
+               select userClaim;
     }
 
     private IQueryable<UserClaim> GetUserClaimsQuery(int userId, string claimType, string claimValue)
     {
         return from userClaim in _context.UserClaims
-            where userClaim.ClaimType == claimType && userClaim.ClaimValue == claimValue
-            from user in userClaim.Users
-            where user.Id == userId
-            select userClaim;
+               where userClaim.ClaimType == claimType && userClaim.ClaimValue == claimValue
+               from user in userClaim.Users
+               where user.Id == userId
+               select userClaim;
     }
 
     private IQueryable<UserClaim> GetUserClaimsQuery(int userId)
     {
         var userClaims = from userClaim in _context.UserClaims
-            from user in userClaim.Users
-            where user.Id == userId
-            select userClaim;
+                         from user in userClaim.Users
+                         where user.Id == userId
+                         select userClaim;
         return userClaims;
     }
 }

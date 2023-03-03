@@ -100,8 +100,13 @@ public static class ConfigureServicesExtensions
         });
     }
 
-    private static string GetConnectionString(IConfiguration configuration, IServiceProvider serviceProvider)
+    private static string? GetConnectionString(IConfiguration configuration, IServiceProvider serviceProvider)
     {
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
+
         var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
         var rootPath = webHostEnvironment.WebRootPath;
         if (string.IsNullOrWhiteSpace(rootPath))
@@ -115,7 +120,7 @@ public static class ConfigureServicesExtensions
             Directory.CreateDirectory(dataDir);
         }
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
+        var connectionString = configuration.GetConnectionString("DefaultConnection")?
             .Replace("|DataDirectory|", dataDir, StringComparison.OrdinalIgnoreCase);
         return connectionString;
     }

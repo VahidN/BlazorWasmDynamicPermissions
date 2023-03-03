@@ -66,12 +66,9 @@ void ConfigureEndpoints(WebApplication app)
     app.MapRazorPages();
     app.MapControllers();
 
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllerRoute(
+    app.MapControllerRoute(
             "default",
             "{controller=Home}/{action=Index}/{id?}");
-    });
 
     // catch-all handler for HTML5 client routes - serve index.html
     app.MapFallbackToFile("index.html");

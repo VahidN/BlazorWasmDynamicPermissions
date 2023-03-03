@@ -6,20 +6,18 @@
           name="viewport"/>
     <title>Blazor Wasm Dynamic Permissions</title>
     <base href="/"/>
-    <link href="lib/bootstrap/dist/css/bootstrap.min.css?v=5" rel="stylesheet"/>
-    <link href="lib/bootstrap-icons/font/bootstrap-icons.css?v=5" rel="stylesheet"/>
-    <link href="css/app.css?v=1" rel="stylesheet"/>
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css?v=7" rel="stylesheet"/>
+    <link href="lib/bootstrap-icons/font/bootstrap-icons.css?v=7" rel="stylesheet"/>
+    <link href="css/app.css?v=7" rel="stylesheet"/>
     <link href="BlazorWasmDynamicPermissions.Client.styles.css" rel="stylesheet"/>
 </head>
 <body>
-<div class="d-flex flex-column min-vh-100" id="app">
-    <div class="d-flex vh-100">
-        <div class="d-flex w-100 justify-content-center align-self-center">
-            <div class="spinner-border text-success m-5" role="status" style="width: 5rem; height: 5rem">
-                <span class="visually-hidden">Loading ... </span>
-            </div>
-        </div>
-    </div>
+<div id="app">
+  <svg class="loading-progress">
+       <circle r="40%" cx="50%" cy="50%" />
+       <circle r="40%" cx="50%" cy="50%" />
+  </svg>
+  <div class="loading-progress-text"></div>
 </div>
 
 <div id="blazor-error-ui">
@@ -27,6 +25,6 @@
     <a class="reload" href="">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
-<script src="_framework/blazor.webassembly.js?v=601"></script>
+<script src="_framework/blazor.webassembly.js?v=701"></script>
 </body>
 </html>

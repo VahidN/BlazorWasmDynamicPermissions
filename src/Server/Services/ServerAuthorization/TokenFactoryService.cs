@@ -164,7 +164,7 @@ public class TokenFactoryService : ITokenFactoryService
         return tokensResponseDto;
     }
 
-    private async Task<(List<Claim>Claims, string TokenSerial)> GetUserClaimsAsync(User user)
+    private async Task<(List<Claim> Claims, string TokenSerial)> GetUserClaimsAsync(User user)
     {
         var tokenSerial = _securityService.CreateCryptographicallySecureGuid().ToString("N");
         var claims = new List<Claim>

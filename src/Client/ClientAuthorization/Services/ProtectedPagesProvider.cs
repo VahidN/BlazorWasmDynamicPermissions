@@ -19,7 +19,7 @@ public class ProtectedPagesProvider : IProtectedPagesProvider
     /// </summary>
     public IReadOnlyList<GroupedProtectedPage> ProtectedPages { get; }
 
-    private static IReadOnlyList<GroupedProtectedPage> GetProtectedPages()
+    private static List<GroupedProtectedPage> GetProtectedPages()
     {
         var allComponents = Assembly
             .GetExecutingAssembly()

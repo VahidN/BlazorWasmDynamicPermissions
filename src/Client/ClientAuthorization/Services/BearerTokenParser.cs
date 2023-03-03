@@ -68,7 +68,7 @@ public static class BearerTokenParser
         };
     }
 
-    private static IList<string> GetRoles(IList<Claim> claims)
+    private static List<string> GetRoles(IList<Claim> claims)
     {
         return claims.Where(claim => string.Equals(claim.Type, ClaimTypes.Role, StringComparison.Ordinal))
             .Select(claim => claim.Value).ToList();

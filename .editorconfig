@@ -1,9 +1,14 @@
+# Code files
+[*.{cs,csx,vb,vbx,razor,html,htm,js,md,cshtml,xaml,vbhtml,aspx,txt,asax,ashx,asmx,master,config}]
+charset = utf-8-bom
+
 [*.cs]
 
 roslynator_accessibility_modifiers = explicit
 roslynator_enum_has_flag_style = operator
 roslynator_object_creation_type_style = implicit_when_type_is_obvious
 
+dotnet_diagnostic.CA1510.severity = suggestion
 dotnet_diagnostic.CA5391.severity = suggestion
 dotnet_diagnostic.CA1303.severity = suggestion
 dotnet_diagnostic.CA1848.severity = suggestion
