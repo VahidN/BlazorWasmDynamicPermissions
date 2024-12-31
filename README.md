@@ -10,13 +10,13 @@ This is a sample project to demonstrate these features:
 - How to mark client-side pages as protected and list all of them automatically.
 - How to render a dynamic menu based on the protected pages list automatically.
 
-![users manager](src/Client/wwwroot/images/bwdp00.png)
+![users manager](src/Server/wwwroot/images/bwdp00.png)
 
 - How to add an admin page to define allowed pages for different users dynamically.
 
-![users manager](src/Client/wwwroot/images/bwdp01.png)
+![users manager](src/Server/wwwroot/images/bwdp01.png)
 
-![users manager](src/Client/wwwroot/images/bwdp02.png)
+![users manager](src/Server/wwwroot/images/bwdp02.png)
 
 - How to trim/hide the dynamically rendered menu items, based on the currently logged-in user's dynamic permissions.
 - How to use JWT's to secure a Blazor WASM's app without using the ASP.NET Core Identity or IdentityServer.
@@ -25,7 +25,7 @@ This is a sample project to demonstrate these features:
 - How to list all of the secured resources on the server automatically.
 - How to define an admin page to define allowed resources on the server (action methods of different controllers) for different users dynamically.
 
-![users manager](src/Client/wwwroot/images/bwdp03.png)
+![users manager](src/Server/wwwroot/images/bwdp03.png)
 
 ## How to run the application
 
