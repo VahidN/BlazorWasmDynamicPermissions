@@ -24,31 +24,28 @@ public partial class UserClientSidePermissions
     {
         var claimsResponse = await HttpClientService.GetDataAsJsonAsync<ClaimsResponseDto>(
             Invariant($"api/DynamicPermissionsManager/UserDynamicClientPermissions/{UserId}"));
+
         SelectedUrls = new HashSet<string>(claimsResponse?.ClaimValues ?? new List<string>(), StringComparer.Ordinal);
         User = claimsResponse?.User;
     }
 
     private async Task DoAddOrUpdateClaimsAsync()
     {
-        var response =
-            await HttpClientService.PostDataAsJsonAsync<ApiResponseDto>(
-                "api/DynamicPermissionsManager/AddOrUpdateClaims",
-                new DynamicClaimsDto
-                {
-                    UserId = UserId,
-                    InputClaimValues = SelectedUrls.ToList(),
-                    ClaimType = CustomPolicies.DynamicClientPermission
-                });
+        var response = await HttpClientService.PostDataAsJsonAsync<ApiResponseDto>(
+            requestUri: "api/DynamicPermissionsManager/AddOrUpdateClaims", new DynamicClaimsDto
+            {
+                UserId = UserId,
+                InputClaimValues = SelectedUrls.ToList(),
+                ClaimType = CustomPolicies.DynamicClientPermission
+            });
+
         if (response?.Success == true)
         {
-            NavigationManager.NavigateTo("users-manager");
+            NavigationManager.NavigateTo(uri: "users-manager");
         }
     }
 
-    private bool IsComponentChecked(string? url)
-    {
-        return !string.IsNullOrWhiteSpace(url) && SelectedUrls.Contains(url);
-    }
+    private bool IsComponentChecked(string? url) => !string.IsNullOrWhiteSpace(url) && SelectedUrls.Contains(url);
 
     private void ComponentCheckboxClicked(string? selectedUrl, object? isChecked)
     {
@@ -61,7 +58,7 @@ public partial class UserClientSidePermissions
         {
             SelectedUrls.Add(selectedUrl);
         }
-        else if (SelectedUrls.Contains(selectedUrl))
+        else
         {
             SelectedUrls.Remove(selectedUrl);
         }

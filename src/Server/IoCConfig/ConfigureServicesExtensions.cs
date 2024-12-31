@@ -1,4 +1,5 @@
 using System.Text;
+using BlazorWasmDynamicPermissions.Client.ClientAuthorization.Services;
 using BlazorWasmDynamicPermissions.Server.DataLayer.Context;
 using BlazorWasmDynamicPermissions.Server.Models.SiteOptions;
 using BlazorWasmDynamicPermissions.Server.Services.ServerAuthorization;
@@ -14,11 +15,10 @@ namespace BlazorWasmDynamicPermissions.Server.IoCConfig;
 public static class ConfigureServicesExtensions
 {
     public static void AddCustomCors(this IServiceCollection services)
-    {
-        services.AddCors(options =>
+        => services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy",
-                builder => builder
+            options.AddPolicy(name: "CorsPolicy", builder
+                => builder
                     .WithOrigins(
                         "http://localhost:4200") //Note:  The URL must be specified without a trailing slash (/).
                     .AllowAnyMethod()
@@ -26,7 +26,6 @@ public static class ConfigureServicesExtensions
                     .SetIsOriginAllowed(host => true)
                     .AllowCredentials());
         });
-    }
 
     public static void AddCustomJwtBearer(this IServiceCollection services, ConfigurationManager configuration)
     {
@@ -39,8 +38,7 @@ public static class ConfigureServicesExtensions
         });
 
         // Needed for jwt auth.
-        services
-            .AddAuthentication(options =>
+        services.AddAuthentication(options =>
             {
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,9 +49,10 @@ public static class ConfigureServicesExtensions
                 cfg.RequireHttpsMetadata = false;
                 cfg.SaveToken = true;
                 var bearerTokenOption = configuration.Get<SiteSettingsDto>()?.BearerToken;
+
                 if (bearerTokenOption is null)
                 {
-                    throw new InvalidOperationException("siteSettings.BearerToken is null");
+                    throw new InvalidOperationException(message: "siteSettings.BearerToken is null");
                 }
 
                 cfg.TokenValidationParameters = new TokenValidationParameters
@@ -62,18 +61,19 @@ public static class ConfigureServicesExtensions
                     ValidateIssuer = true,
                     ValidAudience = bearerTokenOption.Audience, // site that consumes the token
                     ValidateAudience = true,
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(bearerTokenOption.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(bearerTokenOption.Key)),
                     ValidateIssuerSigningKey = true, // verify signature to avoid tampering
                     ValidateLifetime = true, // validate the expiration
                     ClockSkew = TimeSpan.Zero // tolerance for the expiration date
                 };
+
                 cfg.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = context =>
                     {
                         var tokenValidatorService =
                             context.HttpContext.RequestServices.GetRequiredService<ITokenValidatorService>();
+
                         return tokenValidatorService.ValidateAccessTokenAsync(context);
                     }
                 };
@@ -90,13 +90,13 @@ public static class ConfigureServicesExtensions
         services.AddDbContextPool<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
         {
             var connectionString = GetConnectionString(configuration, serviceProvider);
-            optionsBuilder.UseSqlite(connectionString,
-                sqliteOptionsBuilder =>
-                {
-                    var minutes = (int)TimeSpan.FromMinutes(3).TotalSeconds;
-                    sqliteOptionsBuilder.CommandTimeout(minutes);
-                    sqliteOptionsBuilder.MigrationsAssembly(typeof(ConfigureServicesExtensions).Assembly.FullName);
-                });
+
+            optionsBuilder.UseSqlite(connectionString, sqliteOptionsBuilder =>
+            {
+                var minutes = (int)TimeSpan.FromMinutes(minutes: 3).TotalSeconds;
+                sqliteOptionsBuilder.CommandTimeout(minutes);
+                sqliteOptionsBuilder.MigrationsAssembly(typeof(ConfigureServicesExtensions).Assembly.FullName);
+            });
         });
     }
 
@@ -109,26 +109,32 @@ public static class ConfigureServicesExtensions
 
         var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
         var rootPath = webHostEnvironment.WebRootPath;
+
         if (string.IsNullOrWhiteSpace(rootPath))
         {
             rootPath = AppContext.BaseDirectory;
         }
 
-        var dataDir = Path.Combine(rootPath, "wwwroot", "App_Data", "Database");
+        var dataDir = Path.Combine(rootPath, path2: "App_Data", path3: "Database");
+
         if (!Directory.Exists(dataDir))
         {
             Directory.CreateDirectory(dataDir);
         }
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection")?
-            .Replace("|DataDirectory|", dataDir, StringComparison.OrdinalIgnoreCase);
+        var connectionString = configuration.GetConnectionString(name: "DefaultConnection")
+            ?.Replace(oldValue: "|DataDirectory|", dataDir, StringComparison.OrdinalIgnoreCase);
+
         return connectionString;
     }
 
     public static void AddCustomServices(this IServiceCollection services)
     {
+        services.AddCascadingAuthenticationState();
+
         services.AddControllersWithViews();
         services.AddRazorPages();
+        services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
 
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddSingleton<IApiActionsDiscoveryService, ApiActionsDiscoveryService>();
@@ -147,22 +153,21 @@ public static class ConfigureServicesExtensions
     {
         services.AddScoped<IServerSecurityTrimmingService, ServerSecurityTrimmingService>();
         services.AddScoped<IAuthorizationHandler, DynamicServerPermissionsAuthorizationHandler>();
+
         services.AddAuthorization(opts =>
         {
-            opts.AddPolicy(
-                CustomPolicies.DynamicServerPermission,
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new DynamicServerPermissionRequirement());
-                });
+            opts.AddPolicy(CustomPolicies.DynamicServerPermission, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.Requirements.Add(new DynamicServerPermissionRequirement());
+            });
+
+            opts.AddClientPolicies();
         });
 
         return services;
     }
 
     public static void AddCustomConfiguration(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<SiteSettingsDto>(configuration.Bind);
-    }
+        => services.Configure<SiteSettingsDto>(configuration.Bind);
 }

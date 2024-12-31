@@ -1,2 +1,2 @@
-dotnet watch build --project src\Server\BlazorWasmDynamicPermissions.Server.csproj
+dotnet build src\Server\BlazorWasmDynamicPermissions.Server.csproj
 pause

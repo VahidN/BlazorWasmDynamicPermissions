@@ -12,7 +12,7 @@ namespace BlazorWasmDynamicPermissions.Client.ClientAuthorization.Services;
 public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
 {
     private const string RefreshTokenTimerId = nameof(RefreshTokenTimerId);
-    private static readonly string TimerId = Guid.NewGuid().ToString("N");
+    private static readonly string TimerId = Guid.NewGuid().ToString(format: "N");
 
     private readonly IBearerTokensStore _bearerTokensStore;
     private readonly ILocalStorageService _localStorageService;
@@ -21,8 +21,7 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
     private bool _isDisposed;
     private Timer? _timer;
 
-    public ClientRefreshTokenTimer(
-        ILocalStorageService localStorageService,
+    public ClientRefreshTokenTimer(ILocalStorageService localStorageService,
         IBearerTokensStore bearerTokensStore,
         IClientRefreshTokenService refreshTokenService,
         ILogger<ClientRefreshTokenTimer> logger)
@@ -31,7 +30,7 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
         _bearerTokensStore = bearerTokensStore ?? throw new ArgumentNullException(nameof(bearerTokensStore));
         _refreshTokenService = refreshTokenService ?? throw new ArgumentNullException(nameof(refreshTokenService));
         _logger = logger;
-        _logger.LogInformation("Instantiating refresh timer `{TimerId}`.", TimerId);
+        _logger.LogInformation(message: "Instantiating refresh timer `{TimerId}`.", TimerId);
     }
 
     public async Task StartRefreshTimerAsync()
@@ -53,14 +52,11 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
-    private ValueTask RemoveTokensAsync()
-    {
-        return _localStorageService.RemoveItemAsync(RefreshTokenTimerId);
-    }
+    private ValueTask RemoveTokensAsync() => _localStorageService.RemoveItemAsync(RefreshTokenTimerId);
 
     private void CreateOneTimeTimer(TimeSpan? interval)
     {
@@ -82,13 +78,15 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
             if (!await IsCurrentTimerActiveAsync())
             {
                 CleanupCurrentTimer();
-                _logger.LogInformation("Canceled refresh timer `{TimerId}`.", TimerId);
+                _logger.LogInformation(message: "Canceled refresh timer `{TimerId}`.", TimerId);
+
                 return;
             }
 
-            _logger.LogInformation("Running refresh timer `{TimerId}`.", TimerId);
+            _logger.LogInformation(message: "Running refresh timer `{TimerId}`.", TimerId);
 
             var tokens = await _refreshTokenService.TryRefreshTokenAsync();
+
             if (tokens is not null)
             {
                 await StartRefreshTimerAsync();
@@ -96,20 +94,22 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
         }
         catch (Exception ex)
         {
-            _logger.LogInformation("Exception: {Ex}", ex);
+            _logger.LogError(ex, message: "NotifyTimerElapsed Error");
         }
     }
 
     private async Task<TimeSpan?> GetTimerIntervalAsync()
     {
         var jwtInfo = await _bearerTokensStore.GetBearerTokenAsync(BearerTokenType.AccessToken);
+
         if (jwtInfo?.ExpirationDateUtc is null)
         {
             return null;
         }
 
         var interval = jwtInfo.ExpirationDateUtc.Value - DateTime.UtcNow;
-        return interval.Subtract(TimeSpan.FromSeconds(7));
+
+        return interval.Subtract(TimeSpan.FromSeconds(seconds: 7));
     }
 
     private async Task<bool> IsCurrentTimerActiveAsync()
@@ -118,10 +118,9 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
         var lastActiveTimer = await GetLastActiveTimerIdAsync();
         var isActive = string.Equals(lastActiveTimer, TimerId, StringComparison.Ordinal);
 
-
         if (!isActive)
         {
-            _logger.LogInformation("Current timer `{TimerId}` is not active and will be cancelled.", TimerId);
+            _logger.LogInformation(message: "Current timer `{TimerId}` is not active and will be cancelled.", TimerId);
         }
 
         return isActive;
@@ -130,13 +129,11 @@ public class ClientRefreshTokenTimer : IClientRefreshTokenTimer
     private async Task SetTimerIsStartedAsync()
     {
         await _localStorageService.SetItemAsync(RefreshTokenTimerId, TimerId);
-        _logger.LogInformation("Refresh timer `{TimerId}` has been started.", TimerId);
+        _logger.LogInformation(message: "Refresh timer `{TimerId}` has been started.", TimerId);
     }
 
     private async Task<string> GetLastActiveTimerIdAsync()
-    {
-        return await _localStorageService.GetItemAsync<string>(RefreshTokenTimerId) ?? string.Empty;
-    }
+        => await _localStorageService.GetItemAsync<string>(RefreshTokenTimerId) ?? string.Empty;
 
     /// <summary>
     ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

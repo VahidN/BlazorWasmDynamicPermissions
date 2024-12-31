@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorWasmDynamicPermissions.Client.Pages.Identity;
 
-public partial class RedirectToLogin : ComponentBase
+public partial class RedirectToLogin
 {
     [CascadingParameter] private Task<AuthenticationState>? AuthenticationState { set; get; }
 
@@ -15,6 +15,7 @@ public partial class RedirectToLogin : ComponentBase
     [Inject] private IDynamicClientPermissionsProvider DynamicClientPermissionsProvider { set; get; } = default!;
 
     private AuthenticationState? AuthState { set; get; }
+
     private ClaimsResponseDto? DynamicPermissions { set; get; }
 
     protected override async Task OnInitializedAsync()
@@ -33,6 +34,7 @@ public partial class RedirectToLogin : ComponentBase
         }
 
         var returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
         NavigationManager.NavigateTo(string.IsNullOrEmpty(returnUrl)
             ? "login"
             : $"login?returnUrl={Uri.EscapeDataString(returnUrl)}");

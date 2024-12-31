@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+          name="viewport"/>
+    <HeadOutlet @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)"/>
+    <base href="/"/>
+    <link href="@Assets[key: "lib/bootstrap/dist/css/bootstrap.min.css"]" rel="stylesheet"/>
+    <link href="@Assets[key: "lib/bootstrap-icons/font/bootstrap-icons.css"]" rel="stylesheet"/>
+    <link href="@Assets[key: "css/app.css"]" rel="stylesheet"/>
+    <link href="@Assets[key: "BlazorWasmDynamicPermissions.Server.styles.css"]" rel="stylesheet"/>
+</head>
+<body>
+
+<div id="preload">
+    <svg class="loading-progress">
+        <circle r="40%" cx="50%" cy="50%"/>
+        <circle r="40%" cx="50%" cy="50%"/>
+    </svg>
+    <div class="loading-progress-text"></div>
+</div>
+
+<Routes @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)"/>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a class="reload" href="">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.web.js"></script>
+</body>
+</html>

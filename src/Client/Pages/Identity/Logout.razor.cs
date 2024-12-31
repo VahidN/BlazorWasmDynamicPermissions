@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorWasmDynamicPermissions.Client.Pages.Identity;
 
-public partial class Logout : ComponentBase
+public partial class Logout
 {
     [Inject] private NavigationManager NavigationManager { set; get; } = default!;
 
@@ -20,13 +20,15 @@ public partial class Logout : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await HttpClientService.GetDataAsJsonAsync<ApiResponseDto>("api/UsersAccountManager/Logout");
+        var response =
+            await HttpClientService.GetDataAsJsonAsync<ApiResponseDto>(requestUri: "api/UsersAccountManager/Logout");
+
         if (response?.Success == true)
         {
             await BearerTokensStore.RemoveAllBearerTokensAsync();
             await RefreshTokenTimer.StopRefreshTimerAsync();
             ((ClientAuthenticationStateProvider)AuthStateProvider).NotifyUserLogout();
-            NavigationManager.NavigateTo("");
+            NavigationManager.NavigateTo(uri: "");
         }
     }
 }

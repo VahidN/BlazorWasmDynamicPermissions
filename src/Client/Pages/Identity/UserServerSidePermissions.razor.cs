@@ -63,7 +63,7 @@ public partial class UserServerSidePermissions
         {
             SelectedActionIds.Add(selectedActionId);
         }
-        else if (SelectedActionIds.Contains(selectedActionId))
+        else 
         {
             SelectedActionIds.Remove(selectedActionId);
         }

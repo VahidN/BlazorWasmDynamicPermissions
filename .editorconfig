@@ -8,7 +8,14 @@ roslynator_accessibility_modifiers = explicit
 roslynator_enum_has_flag_style = operator
 roslynator_object_creation_type_style = implicit_when_type_is_obvious
 
+dotnet_diagnostic.VSTHRD003.severity = suggestion
+
+dotnet_diagnostic.S6960.severity = suggestion
+dotnet_diagnostic.S3459.severity = suggestion
+dotnet_diagnostic.S1144.severity = suggestion
+
 dotnet_diagnostic.CA1852.severity = suggestion
+dotnet_diagnostic.CA1515.severity = suggestion
 dotnet_diagnostic.CA1510.severity = suggestion
 dotnet_diagnostic.CA5391.severity = suggestion
 dotnet_diagnostic.CA1303.severity = suggestion

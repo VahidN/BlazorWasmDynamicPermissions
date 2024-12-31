@@ -6,45 +6,48 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorWasmDynamicPermissions.Server.Controllers.Identity;
 
-[Authorize(Roles = CustomRoles.Admin),
- Route("api/[controller]"),
- EnableCors("CorsPolicy")]
-public class DynamicPermissionsManagerController : Controller
+[ApiController]
+[Authorize(Roles = CustomRoles.Admin)]
+[Route(template: "api/[controller]")]
+[EnableCors(policyName: "CorsPolicy")]
+public class DynamicPermissionsManagerController : ControllerBase
 {
     private readonly IUserClaimsService _userClaimsService;
 
     public DynamicPermissionsManagerController(IUserClaimsService userClaimsService)
-    {
-        _userClaimsService = userClaimsService ?? throw new ArgumentNullException(nameof(userClaimsService));
-    }
+        => _userClaimsService = userClaimsService ?? throw new ArgumentNullException(nameof(userClaimsService));
 
-    [HttpPost("[action]")]
+    [HttpPost(template: "[action]")]
     public async Task<IActionResult> AddOrUpdateClaims([FromBody] DynamicClaimsDto model)
     {
         if (model is null)
         {
-            return BadRequest("Model is null.");
+            return BadRequest(error: "Model is null.");
         }
 
-        await _userClaimsService.AddOrUpdateUserClaimsAsync(
-            model.UserId, model.ClaimType, model.InputClaimValues);
-        return Ok(new ApiResponseDto { Success = true });
+        await _userClaimsService.AddOrUpdateUserClaimsAsync(model.UserId, model.ClaimType, model.InputClaimValues);
+
+        return Ok(new ApiResponseDto
+        {
+            Success = true
+        });
     }
 
-    [HttpGet("[action]/{userId:int}"),
-     ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet(template: "[action]/{userId:int}")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> UserDynamicClientPermissions(int userId)
     {
-        var permissions =
-            await _userClaimsService.GetUserClaimsAsync(userId, CustomPolicies.DynamicClientPermission);
+        var permissions = await _userClaimsService.GetUserClaimsAsync(userId, CustomPolicies.DynamicClientPermission);
+
         return Ok(permissions);
     }
 
-    [HttpGet("[action]/{userId:int}"),
-     ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet(template: "[action]/{userId:int}")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> DynamicallySecuredServerActions(int userId)
     {
         var securedActions = await _userClaimsService.GetActionsWithDynamicServerPermission(userId);
+
         return Ok(securedActions);
     }
 }

@@ -1,32 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <PublishIISAssets>true</PublishIISAssets>
     <ImplicitUsings>enable</ImplicitUsings>
-     <BlazorLinkOnBuild Condition="'$(Configuration)'!='Release'">false</BlazorLinkOnBuild>
+    <BlazorLinkOnBuild Condition="'$(Configuration)'!='Release'">false</BlazorLinkOnBuild>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Blazored.LocalStorage" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
-    <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\BlazorWasmDynamicPermissions.Shared.csproj" />
   </ItemGroup>
-
-    <ItemGroup>
-        <Content Remove="libman.json" />
-        <Content Remove="package.json" />
-        <Content Remove="tsconfig.json" />
-        <Content Remove="node_modules\**" />
-    </ItemGroup>
 </Project>

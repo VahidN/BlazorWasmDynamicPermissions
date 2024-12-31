@@ -7,15 +7,18 @@ namespace BlazorWasmDynamicPermissions.Client.ClientAuthorization.Services;
 /// </summary>
 public class HttpClientService : IHttpClientService
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly HttpClient _httpClient;
 
     /// <summary>
     ///     A custom  HttpClient Service
     /// </summary>
     public HttpClientService(HttpClient httpClient)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-    }
+        => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     /// <summary>
     ///     Posts data as json to the endpoint
@@ -25,20 +28,15 @@ public class HttpClientService : IHttpClientService
         var response = await _httpClient.PostAsJsonAsync(GetUri(requestUri), value);
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TResult?>(responseContent,
-            new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+
+        return JsonSerializer.Deserialize<TResult?>(responseContent, JsonSerializerOptions);
     }
 
     /// <summary>
     ///     Posts data as json to the endpoint
     /// </summary>
     public async Task<TResult?> GetDataAsJsonAsync<TResult>(string requestUri)
-    {
-        return await _httpClient.GetFromJsonAsync<TResult?>(GetUri(requestUri));
-    }
+        => await _httpClient.GetFromJsonAsync<TResult?>(GetUri(requestUri));
 
     private Uri GetUri(string requestUri)
     {
@@ -48,9 +46,10 @@ public class HttpClientService : IHttpClientService
         }
 
         var baseAddress = _httpClient.BaseAddress;
+
         if (baseAddress is null)
         {
-            throw new InvalidOperationException("`baseAddress` is null.");
+            throw new InvalidOperationException(message: "`baseAddress` is null.");
         }
 
         return new Uri(baseAddress, requestUri);

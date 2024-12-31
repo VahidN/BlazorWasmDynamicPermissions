@@ -3,26 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorWasmDynamicPermissions.Client.ClientAuthorization.Services;
 
-public class
-    DynamicClientPermissionsAuthorizationHandler : AuthorizationHandler<DynamicClientPermissionRequirement>
+public class DynamicClientPermissionsAuthorizationHandler(IClientSecurityTrimmingService securityTrimmingService)
+    : AuthorizationHandler<DynamicClientPermissionRequirement>
 {
-    private readonly IClientSecurityTrimmingService _securityTrimmingService;
-
-    public DynamicClientPermissionsAuthorizationHandler(IClientSecurityTrimmingService securityTrimmingService)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        DynamicClientPermissionRequirement requirement)
     {
-        _securityTrimmingService =
-            securityTrimmingService ?? throw new ArgumentNullException(nameof(securityTrimmingService));
-    }
+        ArgumentNullException.ThrowIfNull(context);
 
-    protected override async Task HandleRequirementAsync(
-        AuthorizationHandlerContext context, DynamicClientPermissionRequirement requirement)
-    {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
-
-        if (await _securityTrimmingService.HasUserAccessToProtectedPageAsync(context.User))
+        if (await securityTrimmingService.HasUserAccessToProtectedPageAsync(context.User))
         {
             context.Succeed(requirement);
         }

@@ -6,7 +6,9 @@ using BlazorWasmDynamicPermissions.Server.Services.ServerAuthorization.Contracts
 using BlazorWasmDynamicPermissions.Shared.Features.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace BlazorWasmDynamicPermissions.Server.Services.ServerAuthorization;
 
@@ -15,9 +17,7 @@ public class TokenValidatorService : ITokenValidatorService
     private readonly BearerTokenOptionDto _configuration;
     private readonly IUserTokensService _userTokensService;
 
-    public TokenValidatorService(
-        IUserTokensService userTokensService,
-        IOptionsSnapshot<SiteSettingsDto> configuration)
+    public TokenValidatorService(IUserTokensService userTokensService, IOptionsSnapshot<SiteSettingsDto> configuration)
     {
         _userTokensService = userTokensService ?? throw new ArgumentNullException(nameof(userTokensService));
 
@@ -38,19 +38,21 @@ public class TokenValidatorService : ITokenValidatorService
 
         var (success, message) =
             await IsValidClaimsPrincipalAsync(context.Principal, context.SecurityToken, BearerTokenType.AccessToken);
+
         if (!success)
         {
             context.Fail(message);
         }
     }
 
-    public async Task<(bool IsValid, ClaimsPrincipal? ClaimsPrincipal, string Message)> IsValidTokenAsync(
-        string? token, BearerTokenType tokenType)
+    public async Task<(bool IsValid, ClaimsIdentity? ClaimsIdentity, string Message)> IsValidTokenAsync(string? token,
+        BearerTokenType tokenType)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
+
         try
         {
-            var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            var tokenValidationResult = await tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
             {
                 ValidIssuer = _configuration.Issuer, // site that makes the token
                 ValidateIssuer = true,
@@ -60,11 +62,17 @@ public class TokenValidatorService : ITokenValidatorService
                 ValidateIssuerSigningKey = true, // verify signature to avoid tampering
                 ValidateLifetime = true, // validate the expiration
                 ClockSkew = TimeSpan.Zero // tolerance for the expiration date
-            }, out var securityToken);
+            });
 
-            var (success, message) =
-                await IsValidClaimsPrincipalAsync(claimsPrincipal, securityToken, tokenType);
-            return (success, claimsPrincipal, message);
+            if (!tokenValidationResult.IsValid)
+            {
+                return (false, null, "Token was not successfully validated.");
+            }
+
+            var (success, message) = await IsValidClaimsPrincipalAsync(tokenValidationResult.ClaimsIdentity,
+                tokenValidationResult.SecurityToken, tokenType);
+
+            return (success, tokenValidationResult.ClaimsIdentity, message);
         }
         catch (Exception ex)
         {
@@ -75,33 +83,43 @@ public class TokenValidatorService : ITokenValidatorService
     public async Task<(string? SerialNumber, string Message)> GetTokenSerialNumberAsync(string token,
         BearerTokenType tokenType)
     {
-        var (isValid, claimsPrincipal, message) = await IsValidTokenAsync(token, tokenType);
+        var (isValid, claimsIdentity, message) = await IsValidTokenAsync(token, tokenType);
+
         if (!isValid)
         {
             return (null, message);
         }
 
-        var serialNumber = claimsPrincipal?.Claims?.FirstOrDefault(
-            c => string.Equals(c.Type, JwtRegisteredClaimNames.Jti, StringComparison.Ordinal))?.Value;
+        var serialNumber = claimsIdentity?.Claims?.FirstOrDefault(
+                c => string.Equals(c.Type, JwtRegisteredClaimNames.Jti, StringComparison.Ordinal))
+            ?.Value;
+
         return (serialNumber, "");
     }
 
-    private async Task<(bool Success, string Message)> IsValidClaimsPrincipalAsync(
-        ClaimsPrincipal? claimsPrincipal, SecurityToken securityToken, BearerTokenType tokenType)
+    private Task<(bool Success, string Message)> IsValidClaimsPrincipalAsync(ClaimsPrincipal? claimsPrincipal,
+        SecurityToken securityToken,
+        BearerTokenType tokenType)
+        => IsValidClaimsPrincipalAsync(claimsPrincipal?.Identity as ClaimsIdentity, securityToken, tokenType);
+
+    private async Task<(bool Success, string Message)> IsValidClaimsPrincipalAsync(ClaimsIdentity? claimsIdentity,
+        SecurityToken securityToken,
+        BearerTokenType tokenType)
     {
-        var claimsIdentity = claimsPrincipal?.Identity as ClaimsIdentity;
         if (claimsIdentity?.Claims is null || !claimsIdentity.Claims.Any())
         {
             return (false, "This is not our issued token. It has no claims.");
         }
 
         var userIdString = claimsIdentity.FindFirst(ClaimTypes.UserData)?.Value;
+
         if (!int.TryParse(userIdString, NumberStyles.Number, CultureInfo.InvariantCulture, out var userId))
         {
             return (false, "This is not our issued token. It has no user-id.");
         }
 
         var userToken = await _userTokensService.GetUserTokenIncludeUserAsync(userId);
+
         if (userToken?.User is not { IsActive: true })
         {
             // user has changed his/her password/roles/stat/IsActive
@@ -109,6 +127,7 @@ public class TokenValidatorService : ITokenValidatorService
         }
 
         var serialNumberClaim = claimsIdentity.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
         if (serialNumberClaim is null)
         {
             return (false, "This is not our issued token. It has no serial.");
@@ -117,13 +136,13 @@ public class TokenValidatorService : ITokenValidatorService
         var dbSerialNUmber = tokenType == BearerTokenType.AccessToken
             ? userToken.AccessTokenSerialNumber
             : userToken.RefreshTokenSerialNumber;
+
         if (!string.Equals(dbSerialNUmber, serialNumberClaim, StringComparison.Ordinal))
         {
             return (false, "This token is expired. Please login again.");
         }
 
-        if (securityToken is not JwtSecurityToken accessToken ||
-            string.IsNullOrWhiteSpace(accessToken.RawData))
+        if (securityToken is not JsonWebToken accessToken || string.IsNullOrWhiteSpace(accessToken.UnsafeToString()))
         {
             return (false, "This token is not in our database.");
         }

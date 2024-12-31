@@ -1,14 +1,15 @@
+using BlazorWasmDynamicPermissions.Server;
 using BlazorWasmDynamicPermissions.Server.IoCConfig;
 using BlazorWasmDynamicPermissions.Server.Services.ServerAuthorization.Contracts;
+using _Imports = BlazorWasmDynamicPermissions.Client._Imports;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging(builder.Logging, builder.Environment, builder.Configuration);
 ConfigureServices(builder.Services, builder.Configuration);
 var webApp = builder.Build();
 ConfigureMiddlewares(webApp, webApp.Environment);
-ConfigureEndpoints(webApp);
 ConfigureDatabase(webApp);
-webApp.Run();
+await webApp.RunAsync();
 
 void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
 {
@@ -30,13 +31,15 @@ void ConfigureLogging(ILoggingBuilder logging, IHostEnvironment env, IConfigurat
         logging.AddConsole();
     }
 
-    logging.AddConfiguration(configuration.GetSection("Logging"));
+    logging.AddConfiguration(configuration.GetSection(key: "Logging"));
 }
 
-void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
+void ConfigureMiddlewares(WebApplication app, IHostEnvironment env)
 {
     if (!env.IsDevelopment())
     {
+        app.UseExceptionHandler(errorHandlingPath: "/Error", createScopeForErrors: true);
+
         app.UseHsts();
     }
     else
@@ -48,30 +51,18 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
 
     app.UseStatusCodePages();
 
-    app.UseBlazorFrameworkFiles();
-
-    app.UseStaticFiles();
-
-    app.UseRouting();
-
+    app.MapStaticAssets();
     app.UseAuthentication();
-
-    app.UseCors("CorsPolicy");
-
+    app.UseCors(policyName: "CorsPolicy");
     app.UseAuthorization();
-}
+    app.UseAntiforgery();
 
-void ConfigureEndpoints(WebApplication app)
-{
-    app.MapRazorPages();
-    app.MapControllers();
+    app.MapControllers().WithStaticAssets();
 
-    app.MapControllerRoute(
-            "default",
-            "{controller=Home}/{action=Index}/{id?}");
-
-    // catch-all handler for HTML5 client routes - serve index.html
-    app.MapFallbackToFile("index.html");
+    app.MapRazorComponents<App>()
+        .AddInteractiveWebAssemblyRenderMode()
+        .AddAdditionalAssemblies(typeof(_Imports).Assembly)
+        .AllowAnonymous();
 }
 
 void ConfigureDatabase(IApplicationBuilder app)

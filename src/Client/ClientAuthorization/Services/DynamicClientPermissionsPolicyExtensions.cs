@@ -9,13 +9,11 @@ public static class DynamicClientPermissionsPolicyExtensions
 {
     public static AuthorizationOptions AddClientPolicies(this AuthorizationOptions options)
     {
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        ArgumentNullException.ThrowIfNull(options);
 
         options.AddPolicy(CustomPolicies.DynamicClientPermission,
             policy => policy.Requirements.Add(new DynamicClientPermissionRequirement()));
+
         return options;
     }
 }

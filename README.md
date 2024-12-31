@@ -1,4 +1,4 @@
-# Blazor WASM Dynamic Permissions
+# Blazor WASM 9x Dynamic Permissions
 
 <p align="left">
   <a href="https://github.com/VahidN/BlazorWasmDynamicPermissions">
@@ -29,4 +29,4 @@ This is a sample project to demonstrate these features:
 
 ## How to run the application
 
-This sample is a Blazor WASM hosted project. To run it you should start the `src\Server` project first. It will create a new SQLite database automatically using the EF-Core's migrations and then seeds it with 3 predefined users which [their details can be found here](src/Server/appsettings.json). Use the Admin user's info to login to the app and then add/change the users' permissions. Now login as them and see the results, including the security trimming of the dynamically rendered menu items and the ability/inability of fetching the dynamically secured server-side resources. 
+This sample is a Blazor WASM 9x hosted project. To run it you should start the `src\Server` project first. It will create a new SQLite database automatically using the EF-Core's migrations and then seeds it with 3 predefined users which [their details can be found here](src/Server/appsettings.json). Use the Admin user's info to login to the app and then add/change the users' permissions. Now login as them and see the results, including the security trimming of the dynamically rendered menu items and the ability/inability of fetching the dynamically secured server-side resources. 

@@ -1,0 +1,46 @@
+@using BlazorWasmDynamicPermissions.Client.Pages.Shared
+<ErrorBoundary @ref="OurErrorBoundary">
+    <ChildContent>
+        <Router AppAssembly="@typeof(Program).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <Authorizing>
+                        <div role="alert" class="alert alert-info">
+                            Authorizing... Please wait...
+                        </div>
+                    </Authorizing>
+                    <NotAuthorized>
+                        <RedirectToLogin></RedirectToLogin>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+            </Found>
+            <NotFound>
+                <PageTitle>Not found!</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <div role="alert" class="alert alert-danger">Sorry, there's nothing at this address.</div>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </ChildContent>
+    <ErrorContent Context="exception">
+        <p dir="ltr">
+            <code>@exception</code>
+        </p>
+    </ErrorContent>
+</ErrorBoundary>
+
+<style>
+    #preload {
+        display: none;
+    }
+</style>
+
+@code{
+
+    private ErrorBoundary? OurErrorBoundary { set; get; }
+
+    // On each page navigation, reset any error state
+    protected override void OnParametersSet() => OurErrorBoundary?.Recover();
+
+}

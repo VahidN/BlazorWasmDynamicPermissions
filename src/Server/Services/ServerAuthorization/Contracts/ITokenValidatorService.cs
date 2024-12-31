@@ -7,8 +7,9 @@ namespace BlazorWasmDynamicPermissions.Server.Services.ServerAuthorization.Contr
 public interface ITokenValidatorService
 {
     Task<(string? SerialNumber, string Message)> GetTokenSerialNumberAsync(string token, BearerTokenType tokenType);
+
     Task ValidateAccessTokenAsync(TokenValidatedContext context);
 
-    Task<(bool IsValid, ClaimsPrincipal? ClaimsPrincipal, string Message)> IsValidTokenAsync(string? token,
+    Task<(bool IsValid, ClaimsIdentity? ClaimsIdentity, string Message)> IsValidTokenAsync(string? token,
         BearerTokenType tokenType);
 }
